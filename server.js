@@ -8,7 +8,17 @@ const PORT = process.env.PORT || 3000;
 const uploadsDir = path.join(__dirname, 'uploads');
 const databaseUrl = process.env.DATABASE_URL;
 
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '10mb' }));
+
+app.get('/', (req, res) => {
+  const origin = `${req.protocol}://${req.get('host')}`;
+  const html = fs
+    .readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8')
+    .replaceAll('__SITE_ORIGIN__', origin);
+  res.type('html').send(html);
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(uploadsDir));
 

