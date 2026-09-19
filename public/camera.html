@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 40px 16px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 720px;
+            margin: auto;
+            padding: 24px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .stage {
+            margin: 20px 0;
+            background: #111;
+            border-radius: 8px;
+            overflow: hidden;
+            min-height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        video, img.preview {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            display: none;
+        }
+        .placeholder {
+            color: #ccc;
+            padding: 40px 16px;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn.secondary {
+            background-color: #6c757d;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 16px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Take a Photo</h2>
+        <p>Start your camera, take a photo, review it, then submit it.</p>
+
+        <div class="stage">
+            <p class="placeholder" id="placeholder">Camera preview will appear here.</p>
+            <video id="video" autoplay playsinline></video>
+            <img id="preview" class="preview" alt="Captured photo preview">
+        </div>
+
+        <canvas id="canvas" width="640" height="480" hidden></canvas>
+
+        <div class="actions">
+            <button class="btn" id="start-btn">Start Camera</button>
+            <button class="btn" id="capture-btn" disabled>Take Photo</button>
+            <button class="btn secondary" id="retake-btn" disabled>Retake</button>
+            <button class="btn" id="submit-btn" disabled>Submit Photo</button>
+        </div>
+        <p class="status" id="status"></p>
+        <p><a href="/">Back</a></p>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const preview = document.getElementById('preview');
+        const placeholder = document.getElementById('placeholder');
+        const statusEl = document.getElementById('status');
+        const startBtn = document.getElementById('start-btn');
+        const captureBtn = document.getElementById('capture-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        const submitBtn = document.getElementById('submit-btn');
+
+        let stream = null;
+        let capturedImage = null;
+
+        function setStatus(message) {
+            statusEl.textContent = message;
+        }
+
+        function showLivePreview() {
+            placeholder.style.display = 'none';
+            preview.style.display = 'none';
+            video.style.display = 'block';
+        }
+
+        function showCapturedPreview() {
+            placeholder.style.display = 'none';
+            video.style.display = 'none';
+            preview.style.display = 'block';
+        }
+
+        function stopCamera() {
+            if (!stream) return;
+            stream.getTracks().forEach((track) => track.stop());
+            stream = null;
+            video.srcObject = null;
+        }
+
+        startBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user' },
+                    audio: false
+                });
+                video.srcObject = stream;
+                await video.play();
+                capturedImage = null;
+                preview.removeAttribute('src');
+                showLivePreview();
+                startBtn.disabled = true;
+                captureBtn.disabled = false;
+                retakeBtn.disabled = true;
+                submitBtn.disabled = true;
+                setStatus('Camera is on. Take a photo when you are ready.');
+            } catch (err) {
+                console.error('Camera permission denied:', err);
+                setStatus('Camera access is required to continue.');
+            }
+        });
+
+        captureBtn.addEventListener('click', () => {
+            if (!stream) return;
+
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            capturedImage = canvas.toDataURL('image/jpeg');
+            preview.src = capturedImage;
+            showCapturedPreview();
+            stopCamera();
+
+            captureBtn.disabled = true;
+            retakeBtn.disabled = false;
+            submitBtn.disabled = false;
+            setStatus('Review your photo. Submit it or retake.');
+        });
+
+        retakeBtn.addEventListener('click', () => {
+            capturedImage = null;
+            preview.removeAttribute('src');
+            startBtn.disabled = false;
+            captureBtn.disabled = true;
+            retakeBtn.disabled = true;
+            submitBtn.disabled = true;
+            placeholder.style.display = 'block';
+            video.style.display = 'none';
+            preview.style.display = 'none';
+            setStatus('Start the camera again to retake your photo.');
+        });
+
+        submitBtn.addEventListener('click', async () => {
+            if (!capturedImage) return;
+
+            submitBtn.disabled = true;
+            setStatus('Submitting photo...');
+
+            try {
+                const res = await fetch('/api/capture', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: capturedImage })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || 'Submit failed');
+                }
+
+                setStatus('Photo submitted successfully.');
+                retakeBtn.disabled = false;
+            } catch (err) {
+                console.error('Error sending data:', err);
+                submitBtn.disabled = false;
+                setStatus('Could not submit the photo. Try again.');
+            }
+        });
+    </script>
+</body>
+</html>
